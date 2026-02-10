@@ -89,39 +89,24 @@ class HomeScreen extends StatelessWidget {
                         ),
                         // Botones superpuestos
                         Positioned(
-                          bottom: 50, // Ajustado para estar dentro de la curva
+                          bottom: 50, 
                           left: 20, 
                           right: 20,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () => context.push('/catalog'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(context).primaryColor,
-                                    foregroundColor: Colors.white,
-                                    elevation: 5,
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                  ),
-                                  child: const Text('VER CATÁLOGO', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: Center(
+                            child: SizedBox(
+                              width: 250, // Fixed width for better aesthetics as single button
+                              child: ElevatedButton(
+                                onPressed: () => context.push('/catalog'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context).primaryColor,
+                                  foregroundColor: Colors.white,
+                                  elevation: 5,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                                 ),
+                                child: const Text('VER CATÁLOGO', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
                               ),
-                              const SizedBox(width: 15),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () => context.push('/operative-request'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white.withOpacity(0.9),
-                                    foregroundColor: Colors.black,
-                                    elevation: 5,
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                  ),
-                                  child: const Text('SOLICITAR OPERATIVO', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         )
                       ],
@@ -255,6 +240,10 @@ class HomeScreen extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 30),
+                
+                // Contact Section Removed
+                
+                const SizedBox(height: 30),
                 _buildFooter(context),
                 const SizedBox(height: 20), // Padding extra
               ],
@@ -356,6 +345,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+
   Widget _buildCompanyLogo(String assetPath) {
     return Container(
       width: 100,
@@ -435,15 +425,26 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Text(op['place'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 5),
-                        Row(
+                        Wrap( 
+                          spacing: 12,
+                          runSpacing: 4,
                           children: [
-                            const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Text(op['location'], style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                            const SizedBox(width: 10),
-                            const Icon(Icons.access_time, size: 14, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Text(op['time'], style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.location_on, size: 14, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(op['location'], style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                              ],
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.access_time, size: 14, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(op['time'], style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                              ],
+                            ),
                           ],
                         ),
                       ],
@@ -451,22 +452,27 @@ class HomeScreen extends StatelessWidget {
                   ),
                   // Action Button
                   if (isUpcoming)
-                    ElevatedButton(
-                      onPressed: () async {
-                        final place = op['place'];
-                        final message = 'Hola quisiera tomar una hora para el operativo en $place';
-                        final url = 'https://wa.me/56944290263?text=${Uri.encodeComponent(message)}';
-                        if (await canLaunchUrl(Uri.parse(url))) {
-                          await launchUrl(Uri.parse(url));
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    SizedBox(
+                      height: 35, // Enforce consistent height
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final place = op['place'];
+                          final message = 'Hola quisiera tomar una hora para el operativo en $place';
+                          final url = 'https://wa.me/56944290263?text=${Uri.encodeComponent(message)}';
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(Uri.parse(url));
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          minimumSize: const Size(0, 0), // Reduce default constraints
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text('Reservar', style: TextStyle(fontSize: 12)),
                       ),
-                      child: const Text('Reservar', style: TextStyle(fontSize: 12)),
                     )
                   else
                     const Chip(label: Text('Finalizado', style: TextStyle(fontSize: 10))),
@@ -481,7 +487,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildReviewCard(BuildContext context, Review review) {
     return Container(
-      width: 250,
+      width: 250, // Fixed width prevents squeezing in ListView
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,

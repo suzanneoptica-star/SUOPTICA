@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
 import 'screens/catalog_screen.dart';
-import 'screens/operative_request_screen.dart';
+// import 'screens/operative_request_screen.dart'; // Deprecated
 import 'screens/my_orders_screen.dart';
 import 'screens/order_detail_screen.dart';
 import 'screens/checkout_screen.dart';
@@ -18,6 +18,7 @@ import 'screens/product_detail_screen.dart';
 import 'models/product.dart';
 import 'providers/auth_provider.dart';
 import 'screens/login_screen.dart';
+import 'screens/contact_screen.dart';
 import 'widgets/responsive_shell.dart';
 
 void main() async {
@@ -47,7 +48,18 @@ final _routerWithGuards = GoRouter(
       routes: [
         GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
         GoRoute(path: '/catalog', builder: (context, state) => const CatalogScreen()),
-        GoRoute(path: '/operative-request', builder: (context, state) => const OperativeRequestScreen()),
+        // Merge Operative Request into Contact Screen
+        GoRoute(
+          path: '/operative-request', 
+          redirect: (context, state) => '/contact?type=operative',
+        ), 
+        GoRoute(
+          path: '/contact', 
+          builder: (context, state) {
+            final type = state.uri.queryParameters['type'];
+            return ContactScreen(initialOperativeRequest: type == 'operative');
+          }
+        ),
         
          GoRoute(
           path: '/product-detail',

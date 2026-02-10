@@ -72,7 +72,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Catálogo Pro'),
+        title: const Text('Catálogo'),
         // Actions removed as they are in the shell
       ), 
       body: Column(

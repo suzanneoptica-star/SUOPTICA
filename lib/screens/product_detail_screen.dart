@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/product.dart';
 import '../models/lens_options.dart';
 import '../models/cart_item.dart';
@@ -19,6 +20,7 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   LensType? _selectedLensType;
   final List<LensTreatment> _selectedTreatments = [];
+  XFile? _prescriptionFile;
 
   bool get _isFrame => widget.product.category == 'Armazones';
 
@@ -29,6 +31,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     if (_isFrame) {
       _selectedLensType = LensData.types.first; 
     }
+  }
+
+  Future<void> _pickPrescription() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _prescriptionFile = image;
+    });
   }
 
   double get _totalPrice {
@@ -108,10 +118,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               const SizedBox(width: 20),
               ElevatedButton.icon(
                 onPressed: () {
+                  // Validate prescription if lens is selected
+                  if (_isFrame && 
+                      _selectedLensType != null && 
+                      _selectedLensType!.id != 'none' && 
+                      _prescriptionFile == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Por favor suba su receta para continuar'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+
                   final cartItem = CartItem(
                     product: widget.product,
                     lensType: _isFrame ? _selectedLensType : null,
                     treatments: _isFrame ? List.from(_selectedTreatments) : [],
+                    prescriptionFile: _prescriptionFile,
                   );
 
                   Provider.of<CartProvider>(context, listen: false).addItem(cartItem);
@@ -271,6 +296,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       dense: true,
                     );
                   }),
+                  
+                  const Divider(),
+                  const Text('3. Subir Receta (Requerido para cristales)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: _pickPrescription,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.blue.withOpacity(0.5), style: BorderStyle.solid),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            _prescriptionFile != null ? Icons.check_circle : Icons.cloud_upload_outlined, 
+                            size: 30, 
+                            color: _prescriptionFile != null ? Colors.green : Colors.blue
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _prescriptionFile != null 
+                              ? 'Receta cargada: ${_prescriptionFile!.name}' 
+                              : 'Toque aquí para subir foto de receta',
+                            style: TextStyle(
+                              color: _prescriptionFile != null ? Colors.green[700] : Colors.blue[700],
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ],
             ),

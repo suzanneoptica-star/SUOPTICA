@@ -30,22 +30,38 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Card(
             elevation: 8,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      _isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: 5,
+                  top: 5,
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.grey),
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/');
+                      }
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          _isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión',
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                     const SizedBox(height: 10),
                      Text(
                       _isRegistering 
@@ -116,9 +132,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 }
